@@ -16,10 +16,9 @@ class PortfolioView(APIView):
             instance = object_is_exist(pk=pk, model=Portfolio)
             serializer = PortfolioSerializer(instance)
             return Response(serializer.data)
-        else:
-            queryset = Portfolio.objects.all()
-            serializer = PortfolioSerializer(queryset, many=True)
-            return Response(serializer.data)
+        queryset = Portfolio.objects.all()
+        serializer = PortfolioSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     def put(self, request):
         try:
