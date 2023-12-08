@@ -19,7 +19,7 @@ class UserView(APIView):
                 serializer = UserSerializer(queryset, many=True)
                 return Response(serializer.data)
         else:
-            return Response({'message' : 'you may have to login'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'detail' : 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
         
 
     def post(self, request):
@@ -42,7 +42,7 @@ class UserView(APIView):
             else:
                 return Response(serializer.errors)
         else:
-            return Response({'message' : 'you may have to login'})
+            return Response({'detail' : 'Authentication credentials were not provided.'})
     
     def patch(self, request):
         auth = isAuth(request=request)
@@ -55,7 +55,7 @@ class UserView(APIView):
             else:
                 return Response(serializer.errors)
         else:
-            return Response({'message' : 'you may have to login'})
+            return Response({'detail' : 'Authentication credentials were not provided.'})
 
     def delete(self, request):
         auth = isAuth(request=request)
@@ -64,5 +64,5 @@ class UserView(APIView):
             instance.is_active = False
             instance.save()
         else:
-            return Response({'message' : 'you may have to login'})
+            return Response({'detail' : 'Authentication credentials were not provided.'})
         
