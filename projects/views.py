@@ -60,3 +60,53 @@ class ProjectView(APIView):
             project.delete()
             return Response({'message' : 'project has been deleted successfuly'})
         return Response({'Error' : 'This project does not belong to you.'})
+    
+class ProjectImageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None, project_pk=None):
+        if pk:
+            instance = object_is_exist(pk=pk, model=ProjectImage)
+            serializer = ProjectImageSerializer(instance)
+            return Response(serializer.data)
+        if project_pk:
+            project = object_is_exist(pk=project_pk, model=Project)
+            queryset = ProjectImage.objects.filter(project_id=project)
+            serializer = ProjectImageSerializer(queryset, many=True)
+            return Response(serializer.data)
+        queryset = ProjectImage.objects.all()
+        serializer = ProjectImageSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serialzer = ProjectImageSerializer(data=request.data)
+        if serialzer.is_valid():
+            isOwner, project = isProjectOwner(request=request, project_pk=request.data['project_id'])
+            if isOwner:
+                serialzer.save()
+                return Response(serialzer.data)
+        return Response(serialzer.errors)
+        
+    
+    def put(self, request, pk):
+        instance = object_is_exist(pk=pk, model=ProjectImage)
+        isOwner, project = isProjectOwner(request=request, project_pk=instance.project_id.pk)
+        if isOwner:
+            serialzer = ProjectImageSerializer(instance=instance, data=request.data)
+            if serialzer.is_valid():
+                serialzer.save()
+                return Response(serialzer.data)
+            return Response(serialzer.errors)
+
+    def patch(self, request, pk):
+        instance = object_is_exist(pk=pk, model=ProjectImage)
+        isOwner, project = isProjectOwner(request=request, project_pk=instance.project_id.pk)
+        if isOwner:
+            serialzer = ProjectImageSerializer(instance=instance, data=request.data, partial=True)
+            if serialzer.is_valid():
+                serialzer.save()
+                return Response(serialzer.data)
+            return Response(serialzer.errors)
+
+    def delete(self, request, pk):
+        pass

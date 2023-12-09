@@ -12,4 +12,4 @@ class Project(models.Model):
 
 class ProjectImage(models.Model):
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='projects/images/')
+    image = models.ImageField(upload_to='project-images/')
