@@ -109,4 +109,9 @@ class ProjectImageView(APIView):
             return Response(serialzer.errors)
 
     def delete(self, request, pk):
-        pass
+        instance = object_is_exist(pk=pk, model=ProjectImage)
+        isOwner, project = isProjectOwner(request=request, project_pk=instance.project_id.pk)
+        if isOwner:
+            instance.delete()
+            instance.save()
+            return Response({'Message' : 'object has been deleted successfully'})
