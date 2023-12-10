@@ -15,10 +15,23 @@ class LikeView(APIView):
             serializer = LikeSerializer(like)
             return Response(serializer.data)
         if project_pk:
+            user_like_it = False
+            user = request.user
             project = object_is_exist(pk=project_pk, model=Project)
+            like = Like.objects.filter(project_id=project, user_id=user).first()
+            if not like:
+                queryset = Like.objects.filter(project_id=project)
+                serializer = LikeSerializer(queryset, many=True)
+                data = serializer.data.copy()
+                data += [{'user_like_it': None}]
+                return Response(data)
+            if like.like_it:
+                user_like_it = True
             queryset = Like.objects.filter(project_id=project)
             serializer = LikeSerializer(queryset, many=True)
-            return Response(serializer.data)
+            data = serializer.data.copy()
+            data += [{'user_like_it': user_like_it}]
+            return Response(data)
         queryset = Like.objects.all()
         serializer = LikeSerializer(queryset, many=True)
         return Response(serializer.data)
