@@ -5,7 +5,6 @@ from talentTrove.shortcuts import object_is_exist, getObjectFromReq
 from .serializers import CommentSerializer, LikeSerializer
 from rest_framework.response import Response
 from projects.models import Project
-from rest_framework.exceptions import ValidationError
 
 class LikeView(APIView):
     permission_classes = [IsAuthenticated]
