@@ -4,9 +4,9 @@ from .models import Comment, Like
 class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
-        exclude = ['user_id']
+        fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        exclude = ['user_id']
+        fields = '__all__'

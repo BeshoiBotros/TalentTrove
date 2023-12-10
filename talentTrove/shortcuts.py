@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework.exceptions import ValidationError
 from projects.models import Project
 from portfolios.models import Portfolio
+from interactions.models import Like
 
 def object_is_exist(pk, model):
     try:
@@ -27,3 +28,10 @@ def isProjectOwner(request, project_pk):
     except Project.DoesNotExist:
         raise ValidationError({'Error' : 'This project Does not found'})
 
+def getObjectFromReq(request, req_key:str, model):
+    try:
+        project_id = request.data[req_key]
+    except:
+        raise ValidationError({'Error' : 'Need to enter the project_id'})
+    project = object_is_exist(pk=project_id, model=model)
+    return project
