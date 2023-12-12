@@ -11,3 +11,6 @@ class Comment(models.Model):
     content = models.TextField(blank=False, null=False)
     user_id    = models.ForeignKey(User, on_delete=models.CASCADE)
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+class View(models.Mode):
+    pass

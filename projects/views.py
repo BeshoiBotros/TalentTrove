@@ -225,9 +225,54 @@ class PortfolioCategoryView(APIView):
             serializer = PortfolioCategorySerializer(instance)
             return Response(serializer.data)
         if getOwenPortfolio == 'True':
-            portfolio = Category.objects.get(user_id=request.user)
+            portfolio = Portfolio.objects.get(user_id=request.user)
             queryset = PortfolioCategory.objects.filter(portfolio=portfolio)
             serializer = PortfolioCategorySerializer(queryset, many=True)
             return Response(serializer.data)
         if portfolio_pk:
-            pass
+            portfolio = object_is_exist(pk=portfolio_pk, model=Portfolio)
+            queryset = PortfolioCategory.objects.filter(portfolio = portfolio)
+            serializer = PortfolioCategorySerializer(queryset, many=True)
+            return Response(serializer.data)
+        queryset = PortfolioCategory.objects.all()
+        serializer = PortfolioCategorySerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        pass
+
+    def patch(self, request, pk):
+        pass
+
+    def delete(self, request, pk):
+        pass
+
+class PortfolioTechnologiesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+    def patch(self, request):
+        pass
+
+    def delete(self, request):
+        pass
+
+class ProjectTechnologiesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+    def patch(self, request):
+        pass
+
+    def delete(self, request):
+        pass
