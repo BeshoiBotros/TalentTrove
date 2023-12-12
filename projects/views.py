@@ -2,10 +2,11 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Project, ProjectImage
-from .serializer import ProjectSerializer, ProjectImageSerializer
+from .serializer import ProjectSerializer, ProjectImageSerializer, CategorySerializer, SubCategorySerializer
 from rest_framework.response import Response
-from talentTrove.shortcuts import object_is_exist, isProjectOwner
+from talentTrove.shortcuts import object_is_exist, isProjectOwner, check_permission
 from portfolios.models import Portfolio
+from .models import Category, SubCategory
 
 class ProjectView(APIView):
     permission_classes = [IsAuthenticated]
@@ -115,3 +116,76 @@ class ProjectImageView(APIView):
             instance.delete()
             instance.save()
             return Response({'Message' : 'object has been deleted successfully'})
+
+class CategoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None):
+        if pk:
+            category = object_is_exist(pk=pk, model=Category)
+            serializer = CategorySerializer(category)
+            return Response(serializer.data)
+        queryset = Category.objects.all()
+        serializer = CategorySerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        can_add_category = check_permission(permission_name='add_category', request=request)
+        if can_add_category:
+            serializer = CategorySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors)
+        else:
+            return Response({'Message' : 'you can not perform this action'})
+        
+
+    def patch(self, request, pk):
+       can_update_category = check_permission(permission_name="change_category", request=request)
+       if can_update_category :
+           instance = object_is_exist(pk=pk, model=Category)
+           serializer = CategorySerializer(instance=instance, data=request.data, partial=True)
+           if serializer.is_valid():
+               serializer.save()
+               return Response(serializer.data)
+           else:
+               return Response(serializer.errors)
+       else:
+           return Response({'Message' : 'you can not perform this actoin'})
+
+    def delete(self, request, pk):
+        can_delete_category = check_permission(permission_name='delete_category', request=request)
+        if can_delete_category:
+            category = object_is_exist(pk=pk, model=Category)
+            category.delete()
+            return Response({'message':'the category has been deleted successfully'})
+
+class SubCategoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None, category_pk=None):
+        if pk:
+            sub_category = object_is_exist(pk=pk, model=SubCategory)
+            serializer = SubCategorySerializer(sub_category)
+            return Response(serializer.data)
+        if category_pk:
+            category = object_is_exist(pk=category_pk, model=Category)
+            queryset = SubCategory.objects.filter(category=category)
+            serializer = SubCategorySerializer(queryset, many=True)
+        queryset = SubCategory.objects.all()
+        serializer = SubCategorySerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        can_add_sub_category = check_permission(permission_name='add_subcategory', request=request)
+        if can_add_sub_category:
+            serializer = SubCategorySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors)
+        else:
+            return Response({'Message' : 'you can not perform this action'})

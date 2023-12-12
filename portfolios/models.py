@@ -12,9 +12,9 @@ class Portfolio(models.Model):
     github_link = models.URLField(null=True, blank=True)
     linkedin_link = models.URLField(null=True, blank=True)
     phone_no = models.CharField(max_length=15, null=True, blank=True)
-
     def __str__(self) -> str:
         return self.user_id.username + ' Portfolio'
+
 
 
 @receiver(post_save, sender=User)

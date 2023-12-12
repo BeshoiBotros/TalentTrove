@@ -35,3 +35,9 @@ def getObjectFromReq(request, req_key:str, model):
         raise ValidationError({'Error' : 'Need to enter the project_id'})
     project = object_is_exist(pk=project_id, model=model)
     return project
+
+def check_permission(permission_name, request):
+    for group in request.user.groups.all():
+        if group.permissions.filter(codename = permission_name):
+            return True
+    return False
