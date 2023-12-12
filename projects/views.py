@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Project, ProjectImage
-from .serializer import ProjectSerializer, ProjectImageSerializer, CategorySerializer, SubCategorySerializer
+from .models import Project, ProjectImage, Category, SubCategory, PortfolioTechnologies, PortfolioCategory, ProjectTechnologies
+from .serializer import ProjectSerializer, ProjectImageSerializer, CategorySerializer, SubCategorySerializer, PortfolioCategorySerializer, ProjectTechnologiesSerializer, PortfolioTechnologiesSerializer
 from rest_framework.response import Response
 from talentTrove.shortcuts import object_is_exist, isProjectOwner, check_permission
 from portfolios.models import Portfolio
-from .models import Category, SubCategory
+
 
 class ProjectView(APIView):
     permission_classes = [IsAuthenticated]
@@ -139,7 +139,7 @@ class CategoryView(APIView):
             else:
                 return Response(serializer.errors)
         else:
-            return Response({'Message' : 'you can not perform this action'})
+            return Response({'Error' : 'you can not perform this action'})
         
 
     def patch(self, request, pk):
@@ -153,14 +153,14 @@ class CategoryView(APIView):
            else:
                return Response(serializer.errors)
        else:
-           return Response({'Message' : 'you can not perform this actoin'})
+           return Response({'Error' : 'you can not perform this actoin'})
 
     def delete(self, request, pk):
         can_delete_category = check_permission(permission_name='delete_category', request=request)
         if can_delete_category:
             category = object_is_exist(pk=pk, model=Category)
             category.delete()
-            return Response({'message':'the category has been deleted successfully'})
+            return Response({'Message':'the category has been deleted successfully'})
 
 class SubCategoryView(APIView):
     permission_classes = [IsAuthenticated]
@@ -188,4 +188,46 @@ class SubCategoryView(APIView):
             else:
                 return Response(serializer.errors)
         else:
-            return Response({'Message' : 'you can not perform this action'})
+            return Response({'Error' : 'you can not perform this action'})
+        
+    def patch(self, request, pk):
+        can_change_sub_category = check_permission(permission_name='change_subcategory', request=request)
+        if can_change_sub_category:
+            instance = object_is_exist(pk=pk, model=SubCategory)
+            serializer = SubCategorySerializer(instance=instance, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors)
+        return Response({'Error' : 'you can not perform this action'})
+    
+    def delete(self, request, pk):
+        can_delete_sub_category = check_permission(permission_name='delete_subcategory', request=request)
+        if can_delete_sub_category:
+            instance = object_is_exist(pk=pk, model=SubCategory)
+            instance.delete()
+            return Response({'Message' : 'Object has been deleted successfully'})
+        return Response({'Error' : 'you can not perform this action'})
+    
+
+class PortfolioCategoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None, portfolio_pk=None):
+        try:
+            getOwenPortfolio = request.GET.get('OwenCategory')
+        except:
+            getOwenPortfolio = None
+        
+        if pk:
+            instance = object_is_exist(pk=pk, model=PortfolioCategory)
+            serializer = PortfolioCategorySerializer(instance)
+            return Response(serializer.data)
+        if getOwenPortfolio == 'True':
+            portfolio = Category.objects.get(user_id=request.user)
+            queryset = PortfolioCategory.objects.filter(portfolio=portfolio)
+            serializer = PortfolioCategorySerializer(queryset, many=True)
+            return Response(serializer.data)
+        if portfolio_pk:
+            pass
