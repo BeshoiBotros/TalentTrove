@@ -1,19 +1,31 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .models import Project, ProjectImage, Category, SubCategory, PortfolioTechnologies, PortfolioCategory, ProjectTechnologies
+from .models import Project, ProjectImage, Category, SubCategory, PortfolioTechnologies, PortfolioCategory, ProjectTechnologies, ProjectViewModel
 from .serializer import ProjectSerializer, ProjectImageSerializer, CategorySerializer, SubCategorySerializer, PortfolioCategorySerializer, ProjectTechnologiesSerializer, PortfolioTechnologiesSerializer
 from rest_framework.response import Response
 from talentTrove.shortcuts import object_is_exist, isProjectOwner, check_permission
 from portfolios.models import Portfolio
-
+from django.utils import timezone
 
 class ProjectView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None):
+        owenPortfolio = object_is_exist(pk=Portfolio.objects.get(user_id=request.user).pk, model=Portfolio)
+        currentDate = timezone.now().date()        
         if pk:
+            user_projects = Project.objects.filter(portfolio_id = owenPortfolio)
+            user_projects_pks = []
+            for user_project in user_projects:
+                user_projects_pks.append(user_project.pk)
             instance = object_is_exist(pk=pk, model=Project)
+
+            if pk not in user_projects_pks:
+                alreadyViewd = ProjectViewModel.objects.filter(user=request.user, project=instance, date__date=currentDate).first()
+                
+                if not alreadyViewd:
+                    ProjectViewModel.objects.create(user=request.user, project=instance)
             serializer = ProjectSerializer(instance=instance)
             return Response(serializer.data)
         queryset = Project.objects.all()

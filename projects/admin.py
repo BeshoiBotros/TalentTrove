@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import ProjectViewModel, Project
 
-# Register your models here.
+admin.site.register(ProjectViewModel)
+admin.site.register(Project)

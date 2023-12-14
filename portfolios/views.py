@@ -2,18 +2,24 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from talentTrove.shortcuts import object_is_exist
-from .models import Portfolio
+from .models import Portfolio, PortfolioViewModel
 from .serializers import PortfolioSerializer
 from rest_framework.response import Response
-from .models import Portfolio
 from talentTrove.shortcuts import object_is_exist
+from django.utils import timezone
 
 class PortfolioView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None):
+        owenPortfolio = object_is_exist(pk=Portfolio.objects.get(user_id=request.user).pk, model=Portfolio)
+        currentDate = timezone.now().date()
         if pk:
             instance = object_is_exist(pk=pk, model=Portfolio)
+            if pk != owenPortfolio.pk:
+                alreadyViewd = PortfolioViewModel.objects.filter(user=request.user, date__date=currentDate, portfolio=instance).first()
+                if not alreadyViewd:
+                    PortfolioViewModel.objects.create(user = request.user, portfolio=instance)
             serializer = PortfolioSerializer(instance)
             return Response(serializer.data)
         queryset = Portfolio.objects.all()
