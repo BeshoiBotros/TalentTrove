@@ -63,3 +63,9 @@ class PortfolioView(APIView):
                 return Response({'Error' : 'cv must be pdf only'})
         else:
             return Response(serializer.errors)
+
+class PortfolioViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, portfolio_pk):
+        pass

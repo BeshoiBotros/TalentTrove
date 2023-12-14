@@ -288,3 +288,11 @@ class ProjectTechnologiesView(APIView):
 
     def delete(self, request):
         pass
+
+class ProjectViews(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, project_pk):
+        pass
+
+
