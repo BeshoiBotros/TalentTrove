@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ProjectView, ProjectImageView, CategoryView, SubCategoryView, PortfolioCategoryView
+from .views import ProjectView, ProjectImageView, CategoryView, SubCategoryView, PortfolioCategoryView, ProjectViews
 
 urlpatterns = [
     path('', ProjectView.as_view()),
@@ -18,6 +18,8 @@ urlpatterns = [
 
     path('portfolio-category/', PortfolioCategoryView.as_view()),
     path('portfolio-category/<int:pk>/', PortfolioCategoryView.as_view()),
-    path('portfolio-category/portfolio/<int:portfolio_pk>/', PortfolioCategoryView.as_view())
+    path('portfolio-category/portfolio/<int:portfolio_pk>/', PortfolioCategoryView.as_view()),
+
+    path('views/project/<int:project_pk>/', ProjectViews.as_view())
     
 ] 

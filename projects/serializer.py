@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project, ProjectImage, Category, SubCategory, ProjectTechnologies, PortfolioTechnologies, PortfolioCategory
+from .models import Project, ProjectImage, Category, SubCategory, ProjectTechnologies, PortfolioTechnologies, PortfolioCategory, ProjectViewModel
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,15 +24,19 @@ class SubCategorySerializer(serializers.ModelSerializer):
 class PortfolioCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PortfolioCategory
-        exclude = ['portfolio']
+        fields = '__all__'
 
 class PortfolioTechnologiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = PortfolioTechnologies
-        exclude = ['portfolio']
+        fields = '__all__'
 
 class ProjectTechnologiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectTechnologies
         fields = '__all__'
         
+class ProjectViewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectViewModel
+        fields = '__all__'

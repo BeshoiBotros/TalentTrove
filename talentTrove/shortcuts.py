@@ -30,11 +30,11 @@ def isProjectOwner(request, project_pk):
 
 def getObjectFromReq(request, req_key:str, model):
     try:
-        project_id = request.data[req_key]
+        request_key = request.data[req_key]
     except:
-        raise ValidationError({'Error' : 'Need to enter the project_id'})
-    project = object_is_exist(pk=project_id, model=model)
-    return project
+        raise ValidationError({'Error' : f'Need to enter the {req_key}'})
+    obj = object_is_exist(pk=request_key, model=model)
+    return obj
 
 def check_permission(permission_name, request):
     for group in request.user.groups.all():

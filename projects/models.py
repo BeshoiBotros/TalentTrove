@@ -29,7 +29,7 @@ class ProjectTechnologies(models.Model):
     sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
 
 class PortfolioCategory(models.Model):
-    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    portfolio = models.OneToOneField(Portfolio, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
 class PortfolioTechnologies(models.Model):

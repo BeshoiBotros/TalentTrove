@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from talentTrove.shortcuts import object_is_exist
 from .models import Portfolio, PortfolioViewModel
-from .serializers import PortfolioSerializer
+from .serializers import PortfolioSerializer, PortfolioViewsSerializer
 from rest_framework.response import Response
 from talentTrove.shortcuts import object_is_exist
 from django.utils import timezone
@@ -67,5 +67,16 @@ class PortfolioView(APIView):
 class PortfolioViews(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, portfolio_pk):
-        pass
+    def get(self, request, portfolio_pk):
+        portfolio = object_is_exist(portfolio_pk, Portfolio)
+        portfolio_views = PortfolioViewModel.objects.filter(portfolio_id=portfolio)
+        portfolio_views_not_repeted = []
+        portfolio_views_users = []
+        for view in portfolio_views:
+            if view.user.pk not in portfolio_views_users:
+                portfolio_views_not_repeted.append(view)
+                portfolio_views_users.append(view.user.pk)
+        portfolio_views_not_repeted_serializer = PortfolioViewsSerializer(portfolio_views, many=True)
+        data = portfolio_views_not_repeted_serializer.data
+        data += [{'views': len(portfolio_views_not_repeted)}]
+        return Response(data)

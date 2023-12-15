@@ -2,11 +2,12 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Project, ProjectImage, Category, SubCategory, PortfolioTechnologies, PortfolioCategory, ProjectTechnologies, ProjectViewModel
-from .serializer import ProjectSerializer, ProjectImageSerializer, CategorySerializer, SubCategorySerializer, PortfolioCategorySerializer, ProjectTechnologiesSerializer, PortfolioTechnologiesSerializer
+from .serializer import ProjectSerializer, ProjectImageSerializer, CategorySerializer, SubCategorySerializer, PortfolioCategorySerializer, ProjectTechnologiesSerializer, PortfolioTechnologiesSerializer, ProjectViewsSerializer
 from rest_framework.response import Response
 from talentTrove.shortcuts import object_is_exist, isProjectOwner, check_permission
 from portfolios.models import Portfolio
 from django.utils import timezone
+from rest_framework import status
 
 class ProjectView(APIView):
     permission_classes = [IsAuthenticated]
@@ -227,19 +228,9 @@ class PortfolioCategoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk=None, portfolio_pk=None):
-        try:
-            getOwenPortfolio = request.GET.get('OwenCategory')
-        except:
-            getOwenPortfolio = None
-        
         if pk:
             instance = object_is_exist(pk=pk, model=PortfolioCategory)
             serializer = PortfolioCategorySerializer(instance)
-            return Response(serializer.data)
-        if getOwenPortfolio == 'True':
-            portfolio = Portfolio.objects.get(user_id=request.user)
-            queryset = PortfolioCategory.objects.filter(portfolio=portfolio)
-            serializer = PortfolioCategorySerializer(queryset, many=True)
             return Response(serializer.data)
         if portfolio_pk:
             portfolio = object_is_exist(pk=portfolio_pk, model=Portfolio)
@@ -251,13 +242,45 @@ class PortfolioCategoryView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        pass
+        owenPortfolio = Portfolio.objects.get(user=request.user)
+        try:
+            category = request.data['category']
+        except:
+            return Response({'Error' : 'Category must be selected'}, status=status.HTTP_400_BAD_REQUEST)
+        data = {
+            'portfolio' : owenPortfolio,
+            'category' : category
+        }
+        serializer = PortfolioCategorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
-    def patch(self, request, pk):
-        pass
+    def patch(self, request):
+        owenPortfolio = Portfolio.objects.get(user=request.user)
+        try:
+            category = request.data['category']
+        except:
+            category = None
+        if category:
+            data = {
+                'portfolio' : owenPortfolio,
+                'category' : category
+            }
+            serializer = PortfolioCategorySerializer(data=data)
+        else:
+            data = {
+                'portfolio' : owenPortfolio,
+            }
+            serializer = PortfolioCategorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
-    def delete(self, request, pk):
-        pass
 
 class PortfolioTechnologiesView(APIView):
     permission_classes = [IsAuthenticated]
@@ -292,7 +315,16 @@ class ProjectTechnologiesView(APIView):
 class ProjectViews(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, project_pk):
-        pass
-
-
+    def get(self, request, project_pk):
+        project = object_is_exist(project_pk, Project)
+        project_views = ProjectViewModel.objects.filter(project=project)
+        project_views_not_repeted = []
+        project_views_users = []
+        for view in project_views:
+            if view.user.pk not in project_views_users:
+                project_views_not_repeted.append(view)
+                project_views_users.append(view.user.pk)
+        project_views_not_repeted_serializer = ProjectViewsSerializer(project_views_not_repeted, many=True)
+        data = project_views_not_repeted_serializer.data
+        data += [{'views' : len(project_views_not_repeted)}]
+        return Response(data)
