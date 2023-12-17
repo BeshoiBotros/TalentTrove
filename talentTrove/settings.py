@@ -27,7 +27,6 @@ SECRET_KEY = 'django-insecure-b$dwfnc%ul_q7naj7_!#)ing7q*ufq4ks6ugae#4n#17$q1dy6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -39,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'notifications',
     'accounts',
     'portfolios',
     'interactions',
@@ -46,7 +46,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'django_websockets',
+    'corsheaders',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -56,7 +59,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+# settings.py
+
+CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = 'talentTrove.urls'
 
@@ -76,7 +85,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'talentTrove.wsgi.application'
 
 REST_FRAMEWORK = {
     

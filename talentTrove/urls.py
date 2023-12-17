@@ -7,7 +7,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('portfolios/', include('portfolios.urls')),
     path('projects/', include('projects.urls')),
-    path('interactions/', include('interactions.urls'))
+    path('interactions/', include('interactions.urls')),
+    path('notifications/', include('notifications.urls'))
 ]
 
 from django.conf import settings
